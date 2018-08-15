@@ -8,7 +8,7 @@ textao = open('dados.txt','w')
 a = 1
 
 for i in lines:
-    print("Fazendo o # {} de um total {}".format(a, lines.__len__() -1 ))
+    print("Fazendo o # {} de um total {}".format(a, lines.__len__()))
     url1 = "https://www.receitaws.com.br/v1/cnpj/" + i
     response = requests.get(url1)
     sc = response.status_code
@@ -19,7 +19,7 @@ for i in lines:
         print(fantasia)
         emails = todos['email']
         print(emails + "\n")
-        textao.write('{},{}'.format(fantasia,emails))
+        textao.write('{},{}\n'.format(fantasia,emails))
         #aguarda 20 segs
         time.sleep(20)
         a = a + 1
