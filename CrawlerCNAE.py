@@ -62,6 +62,3 @@ for i in lines:
 
 textao.close()
 print("""Finalizado com sucesso! Parabéns!!! """)
-
-#para fazer o scrape no google
-#url.split("/")[-2]
