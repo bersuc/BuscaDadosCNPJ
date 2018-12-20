@@ -2,10 +2,16 @@ import json
 import requests
 import time
 
-
+#abre o arquivo com os CNPJ's por linha
 arq = open('lista.txt','r')
+
+#entende que a quebra de linha corresponde a 1 cnpj
 lines = [line.rstrip('\n') for line in arq]
+
+#cria o arquivo onde serão inseridos os dados coletados
 textao = open('dados.txt','w')
+
+#cria o arquivo de log para ler os CNPJ's com problemas
 errosCNPJ = open('erros.txt','w')
 
 #numero da linha que esta sendo percorrida
@@ -16,7 +22,7 @@ for i in lines:
     if len(i) <14:
         pass
     else:
-        print("Fazendo o # {} de um total {}".format(a, lines.__len__()))
+        print("\nFazendo o # {} de um total {}".format(a, lines.__len__()))
         url1 = "https://www.receitaws.com.br/v1/cnpj/" + i
         
         response = requests.get(url1)
@@ -24,24 +30,24 @@ for i in lines:
 
         #Se o status code da pag for 200, segue o loop
         if sc == 200:      
-            print('\nStatus code: {}\nHorário: {}'.format(response.status_code,time.ctime()))
+            print('Status code: {}\nHorário: {}'.format(response.status_code,time.ctime()))
             todos = json.loads(response.text)
             #pega o nome no JSON e imprime para verificar na tela se há erro
             if 'nome' in todos:
                 nome = todos['nome']
-                print('\n')
+                atividade = todos['atividade_principal'][0]['text']
+                cnae = todos['atividade_principal'][0]['code']
+
+                #tamanho da atividade
+                tamanhoAtividade = len(atividade)
+
+                #formatando a exibição para ficar mais limpa
+                print(tamanhoAtividade * '-')
                 print(i)
                 print(nome)
-                        
-                #pega a atividade index 0 e dentro dela o text (tipo de atividade) no JSON 
-                atividade = todos['atividade_principal'][0]['text']
-                # imprime para verificar na tela se há erro
                 print(atividade)
-
-                #pega a atividade index 0 e dentro dela o CNAE (código de atividade) no JSON 
-                cnae = todos['atividade_principal'][0]['code']
-                # imprime para verificar na tela se há erro
-                print(cnae + "\n")
+                print(cnae)
+                print(tamanhoAtividade * '-')
 
                 #joga no arquivo as informações obtidas do cnpj
                 textao.write('{}; {}; {}; {}'.format(i,nome,atividade,cnae))
