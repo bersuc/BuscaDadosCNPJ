@@ -2,68 +2,113 @@ import json
 import requests
 import time
 
-# abre o arquivo com os CNPJ's por linha
-arq = open('lista.txt', 'r')
+"""
+Melhorando o arquivo
+criando variavel global para chamar e fechar o arquivo de texto.
+trabalhando corretamente OOP (ou tentando 😜)
+"""
 
-# entende que a quebra de linha corresponde a 1 cnpj
-lines = [line.rstrip('\n') for line in arq]
+arq = None
+textao = None
+errosCNPJ = None
+todos = None
 
-# cria o arquivo onde serão inseridos os dados coletados
-textao = open('dados.txt', 'w')
 
-# cria o arquivo de log para ler os CNPJ's com problemas
-errosCNPJ = open('erros.txt', 'w')
+def arquivos():
+    global arq
+    global textao
+    global errosCNPJ
+    arq = open('lista.txt', 'r')
+    lines = [line.rstrip('\n') for line in arq]
+    textao = open('dados.txt', 'w')
+    errosCNPJ = open('erros.txt', 'w')
+    return lines
 
-# numero da linha que esta sendo percorrida
-a = 1
 
-for i in lines:
+"""
+Fecha os arquivos abertos anteriormente
+"""
 
-    if len(i) < 14:
-        pass
+
+def fechar():
+    global arq
+    global textao
+    global errosCNPJ
+    arq.close()
+    textao.close()
+    errosCNPJ.close()
+    print('Processo concluído com sucesso!')
+
+
+def pegaJson(cnpj):
+    url = "https://www.receitaws.com.br/v1/cnpj/" + cnpj
+    response = requests.get(url)
+    sc = response.status_code
+    if sc == 200:
+        print('Status code: {}\nHorário: {}'.format(response.status_code, time.ctime()))
+        todos = json.loads(response.text)
+        # adicionando um try pois pode não existir o CNPJ
+        try:
+            dados = {
+            "Nome": todos['nome'],
+            "Atividade": todos['atividade_principal'][0]['text'],
+            "CNAE": todos['atividade_principal'][0]['code']
+            }
+        except:
+            # chamar log de erro para gravar CNPJ
+            print('############################################\n')
+            print('Erro ao obrter informações do {}\n'.format(cnpj))
+            print('############################################\n')
+            gravaErros(cnpj)
+            dados = {
+                "Nome": "Erro ao buscar nome",
+                "Atividade": "Erro ao buscar atividade",
+                "CNAE": "Erro ao buscar CNAE"
+            }
+        return dados
     else:
-        print("\nFazendo o # {} de um total {}".format(a, lines.__len__()))
-        url1 = "https://www.receitaws.com.br/v1/cnpj/" + i
+        print('Aguardando 5 segundos. Motivo Status Code não é 200: {}'.format(sc))
+        time.sleep(5)
+        pegaJson(cnpj)
 
-        response = requests.get(url1)
-        sc = response.status_code
 
-        # Se o status code da pag for 200, segue o loop
-        if sc == 200:
-            print('Status code: {}\nHorário: {}'.format(response.status_code, time.ctime()))
-            todos = json.loads(response.text)
-            # pega o nome no JSON e imprime para verificar na tela se há erro
-            if 'nome' in todos:
-                nome = todos['nome']
-                atividade = todos['atividade_principal'][0]['text']
-                cnae = todos['atividade_principal'][0]['code']
+"""
+Tempo de 20 segundos para ler a API, só pode consultar 3x por minuto,
+ou seja, 1 consulta a cada 20 segundos
+"""
+def descansa():
+    time.sleep(20)
 
-                # tamanho da atividade
-                tamanhoAtividade = len(atividade)
 
-                # formatando a exibição para ficar mais limpa
-                print(tamanhoAtividade * '-')
-                print(i)
-                print(nome)
-                print(atividade)
-                print(cnae)
-                print(tamanhoAtividade * '-')
+def gravaDados(cnpj, infocnpj):
+    global textao
+    _nome = infocnpj['Nome']
+    _atividade = infocnpj['Atividade']
+    _cnae = infocnpj['CNAE']
+    textao.write(cnpj + ';' + _nome + ';' + _atividade + ';' + _cnae + '\n')
 
-                # joga no arquivo as informações obtidas do cnpj
-                textao.write('{}; {}; {}; {}'.format(i, nome, atividade, cnae))
-                textao.write('\n')
-            else:
-                print('############################################\n')
-                print('Erro ao obrter informações do {}\n'.format(i))
-                print('############################################\n')
-                errosCNPJ.write('-> Erro : CNPJ {}'.format(i))
-                errosCNPJ.write('\n')
 
-        # Aguarda 20 segs para dar o loop
-        # A API só permite 3 conexões por minuto (1 a cada 20 seg)
-        a = a + 1
-        if a != lines.__len__:
-            time.sleep(20)
+def gravaErros(cnpj):
+    global errosCNPJ
+    errosCNPJ.write('CNPJ ' + cnpj)
 
-textao.close()
-print("""Finalizado com sucesso! Parabéns!!! """)
+
+if __name__ == '__main__':
+    lista = arquivos()
+    a = 1
+    for linha in lista:
+        if len(linha) == 14:
+            print("Fazendo o # {} de um total {}".format(a, len(lista)))
+            print('CNPJ: ' + linha)
+            infocnpj = pegaJson(linha)
+            print(infocnpj['Nome'])
+            print(infocnpj['Atividade'])
+            print(infocnpj['CNAE'])
+            print('\n')
+            gravaDados(linha,infocnpj)
+            if a != len(lista):
+                descansa()
+        else:
+            pass
+        a += 1
+    fechar()
