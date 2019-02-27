@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+__author__ = 'Diogo Bersuc'
+
 import json
 import requests
 import time
