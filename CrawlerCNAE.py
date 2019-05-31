@@ -112,7 +112,7 @@ if __name__ == '__main__':
             print("Fazendo o # {} de um total {}".format(a, len(lista)))
             print('CNPJ: ' + linha)
             infocnpj = pegaJson(linha)
-            print(infocnpj['Nome'])
+            print(infocnpj['Nome']) 
             print(infocnpj['Atividade'])
             print(infocnpj['CNAE'])
             print('\n')
