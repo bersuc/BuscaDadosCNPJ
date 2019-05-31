@@ -92,11 +92,22 @@ def gravaErros(cnpj):
     global errosCNPJ
     errosCNPJ.write('CNPJ ' + cnpj)
 
+"""
+Recebe a linha com o CNPJ, o CNPJ poderá conter pontos ou / - Padrão é xxx.xxx.xxx/xxxx-xx
+Remover -> . / - 
+"""
+def removeChars(linha):
+    newLinha = linha.replace('.', '')
+    newLinha = linha.replace('/', '')
+    newLinha = linha.replace('-', '')
+    return newLinha
+
 
 if __name__ == '__main__':
     lista = arquivos()
     a = 1
     for linha in lista:
+        linha = removeChars(linha)
         if len(linha) == 14:
             print("Fazendo o # {} de um total {}".format(a, len(lista)))
             print('CNPJ: ' + linha)
