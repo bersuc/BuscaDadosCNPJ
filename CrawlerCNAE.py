@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+__author__ = 'Diogo Bersuc'
+
 import json
 import requests
 import time
@@ -12,7 +15,7 @@ arq = None
 textao = None
 errosCNPJ = None
 todos = None
-
+contador = 0
 
 def arquivos():
     global arq
@@ -41,6 +44,7 @@ def fechar():
 
 
 def pegaJson(cnpj):
+    global contador
     url = "https://www.receitaws.com.br/v1/cnpj/" + cnpj
     response = requests.get(url)
     sc = response.status_code
@@ -57,19 +61,25 @@ def pegaJson(cnpj):
         except:
             # chamar log de erro para gravar CNPJ
             print('############################################\n')
-            print('Erro ao obrter informações do {}\n'.format(cnpj))
+            print('Erro ao obrter informações do cnpj')
             print('############################################\n')
             gravaErros(cnpj)
-            dados = {
-                "Nome": "Erro ao buscar nome",
-                "Atividade": "Erro ao buscar atividade",
-                "CNAE": "Erro ao buscar CNAE"
-            }
-        return dados
+    #
+    # possivel update
+    #
+    # elif response.status_code == 504:
+    #     descansa()
+    #     contador += 1
+    #     print('o contador é {}' .format(contador))
+    #     if contador > 3:
+    #         gravaErros(cnpj)
+    #         pass
+    #     pegaJson(cnpj)
     else:
         print('Aguardando 5 segundos. Motivo Status Code não é 200: {}'.format(sc))
-        time.sleep(5)
+        descansa()
         pegaJson(cnpj)
+    return dados
 
 
 """
@@ -77,6 +87,7 @@ Tempo de 20 segundos para ler a API, só pode consultar 3x por minuto,
 ou seja, 1 consulta a cada 20 segundos
 """
 def descansa():
+    print('Ativando Descanso de 20 segundos')
     time.sleep(20)
 
 
@@ -90,6 +101,11 @@ def gravaDados(cnpj, infocnpj):
 
 def gravaErros(cnpj):
     global errosCNPJ
+    dados = {
+        "Nome": "Erro ao buscar nome",
+        "Atividade": "Erro ao buscar atividade",
+        "CNAE": "Erro ao buscar CNAE"
+    }
     errosCNPJ.write('CNPJ ' + cnpj)
 
 """
@@ -100,6 +116,13 @@ def removeChars(linha):
     newLinha = linha.replace('.', '')
     newLinha = linha.replace('/', '')
     newLinha = linha.replace('-', '')
+    # verifica se é CNPJ quando tem 0001 numa determinada posição 
+    if (newLinha[-6:-2]) == '0001':
+        # No Loop = better
+        # newLinha = ('0' * (14 - len(newLinha)) + newLinha)
+        while len(newLinha) < 14:
+            # enquanto o CNPJ for menor que 14, insere zeros no começo do CNPJ
+            newLinha = '0' + newLinha
     return newLinha
 
 
@@ -122,4 +145,5 @@ if __name__ == '__main__':
         else:
             pass
         a += 1
+        contador = 0
     fechar()

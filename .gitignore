@@ -3,6 +3,7 @@
 *.xlsx
 test*.json
 /node_modules
+/.vscode
 .vscode
 .idea
 /cnpj
