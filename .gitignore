@@ -1,0 +1,9 @@
+*.txt
+*.csv
+*.xlsx
+test*.json
+/node_modules
+.vscode
+.idea
+/cnpj
+/__pycache__

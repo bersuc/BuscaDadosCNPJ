@@ -1,0 +1,27 @@
+{
+  "name": "diogo",
+  "version": "1.0.0",
+  "description": "Crawler CNPJ from API ",
+  "main": "crawler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bersuc/BuscaDadosCNPJ.git"
+  },
+  "keywords": [
+    "receita",
+    "cnpj",
+    "cnae"
+  ],
+  "author": "Diogo Bersuc",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bersuc/BuscaDadosCNPJ/issues"
+  },
+  "homepage": "https://github.com/bersuc/BuscaDadosCNPJ#readme",
+  "dependencies": {
+    "request": "^2.88.0"
+  }
+}
