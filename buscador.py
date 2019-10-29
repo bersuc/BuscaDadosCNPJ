@@ -21,5 +21,14 @@ class Buscador:
         self.errosCNPJ = open('erros.txt', 'w')
         return lines
 
+    """
+    Fecha os arquivos abertos anteriormente
+    """
+    def fechar(self):
+        self.arq.close()
+        self.textao.close()
+        self.errosCNPJ.close()
+        print('Processo concluído com sucesso!')
+
     if __name__ == "__main__":
         pass
