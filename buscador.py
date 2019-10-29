@@ -7,7 +7,7 @@ import time
 
 
 class Buscador:
-    def __init__(self, arq, textao, errosCNPJ, todos, contador):
+    def __init__(self):
         self.arq = None
         self.textao = None
         self.errosCNPJ = None
@@ -24,11 +24,22 @@ class Buscador:
     """
     Fecha os arquivos abertos anteriormente
     """
+
     def fechar(self):
         self.arq.close()
         self.textao.close()
         self.errosCNPJ.close()
         print('Processo concluído com sucesso!')
 
-    if __name__ == "__main__":
-        pass
+    def pegaJson(self, cnpj):
+        self.contador
+        url = "https://www.receitaws.com.br/v1/cnpj/" + cnpj
+        response = requests.get(url)
+        # sc = response.status_code
+        todos = json.loads(response.text)
+        return todos
+
+
+if __name__ == "__main__":
+    var = Buscador().pegaJson("27865757000102")
+    print(var)
