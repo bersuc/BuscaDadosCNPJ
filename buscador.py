@@ -15,16 +15,22 @@ class Buscador:
         self.contador = 0
 
     def arquivos(self):
+        """
+        Open lista.txt with all CNPJ's in each line. Ex: 
+        27.865.757/0001-02
+        27.865.757/0001-02
+        
+        Returns:
+        List
+        """
         self.arq = open('lista.txt', 'r')
         lines = [line.rstrip('\n') for line in self.arq]
         self.textao = open('dados.txt', 'w')
         self.errosCNPJ = open('erros.txt', 'w')
         return lines
 
-    """
-    Fecha os arquivos abertos anteriormente
-    """
     def fechar(self):
+        '''Close all files.'''
         self.arq.close()
         self.textao.close()
         self.errosCNPJ.close()
@@ -61,8 +67,10 @@ class Buscador:
 
 
 if __name__ == "__main__":
+    buscador = Buscador()
     inicio = time.time()
-    var = Buscador().pegaJson("27865757000102")
+    var = buscador.pegaJson("27865757000102")
+    # buscador.fechar()
     fim = time.time()
     print(fim - inicio)
     print(var)
