@@ -121,15 +121,15 @@ Remover -> . / -
 
 def removeChars(linha):
     newLinha = linha.replace('.', '')
-    newLinha = linha.replace('/', '')
-    newLinha = linha.replace('-', '')
+    newLinha = newLinha.replace('/', '')
+    newLinha = newLinha.replace('-', '')
     # verifica se é CNPJ quando tem 0001 numa determinada posição
-    if (newLinha[-6:-2]) == '0001':
-        # No Loop = better
-        # newLinha = ('0' * (14 - len(newLinha)) + newLinha)
-        while len(newLinha) < 14:
-            # enquanto o CNPJ for menor que 14, insere zeros no começo do CNPJ
-            newLinha = '0' + newLinha
+    # if (newLinha[-6:-2]) == '0001':
+    #     # No Loop = better
+    #     # newLinha = ('0' * (14 - len(newLinha)) + newLinha)
+    while len(newLinha) < 14:
+        # enquanto o CNPJ for menor que 14, insere zeros no começo do CNPJ
+        newLinha = '0' + newLinha
     return newLinha
 
 
