@@ -17,6 +17,7 @@ errosCNPJ = None
 todos = None
 contador = 0
 
+
 def arquivos():
     global arq
     global textao
@@ -49,16 +50,17 @@ def pegaJson(cnpj):
     response = requests.get(url)
     sc = response.status_code
     if sc == 200:
-        print('Status code: {}\nHorário: {}'.format(response.status_code, time.ctime()))
+        print('Status code: {}\nHorário: {}'.format(
+            response.status_code, time.ctime()))
         todos = json.loads(response.text)
         # adicionando um try pois pode não existir o CNPJ
         try:
             dados = {
-            "Nome": todos['nome'],
-            "Atividade": todos['atividade_principal'][0]['text'],
-            "CNAE": todos['atividade_principal'][0]['code']
+                "Nome": todos['nome'],
+                "Atividade": todos['atividade_principal'][0]['text'],
+                "CNAE": todos['atividade_principal'][0]['code']
             }
-        except:
+        except ValueError:
             # chamar log de erro para gravar CNPJ
             print('############################################\n')
             print('Erro ao obrter informações do cnpj')
@@ -86,6 +88,8 @@ def pegaJson(cnpj):
 Tempo de 20 segundos para ler a API, só pode consultar 3x por minuto,
 ou seja, 1 consulta a cada 20 segundos
 """
+
+
 def descansa():
     print('Ativando Descanso de 20 segundos')
     time.sleep(20)
@@ -108,21 +112,24 @@ def gravaErros(cnpj):
     }
     errosCNPJ.write('CNPJ ' + cnpj)
 
+
 """
 Recebe a linha com o CNPJ, o CNPJ poderá conter pontos ou / - Padrão é xxx.xxx.xxx/xxxx-xx
 Remover -> . / - 
 """
+
+
 def removeChars(linha):
     newLinha = linha.replace('.', '')
-    newLinha = linha.replace('/', '')
-    newLinha = linha.replace('-', '')
-    # verifica se é CNPJ quando tem 0001 numa determinada posição 
-    if (newLinha[-6:-2]) == '0001':
-        # No Loop = better
-        # newLinha = ('0' * (14 - len(newLinha)) + newLinha)
-        while len(newLinha) < 14:
-            # enquanto o CNPJ for menor que 14, insere zeros no começo do CNPJ
-            newLinha = '0' + newLinha
+    newLinha = newLinha.replace('/', '')
+    newLinha = newLinha.replace('-', '')
+    # verifica se é CNPJ quando tem 0001 numa determinada posição
+    # if (newLinha[-6:-2]) == '0001':
+    #     # No Loop = better
+    #     # newLinha = ('0' * (14 - len(newLinha)) + newLinha)
+    while len(newLinha) < 14:
+        # enquanto o CNPJ for menor que 14, insere zeros no começo do CNPJ
+        newLinha = '0' + newLinha
     return newLinha
 
 
@@ -135,11 +142,11 @@ if __name__ == '__main__':
             print("Fazendo o # {} de um total {}".format(a, len(lista)))
             print('CNPJ: ' + linha)
             infocnpj = pegaJson(linha)
-            print(infocnpj['Nome']) 
+            print(infocnpj['Nome'])
             print(infocnpj['Atividade'])
             print(infocnpj['CNAE'])
             print('\n')
-            gravaDados(linha,infocnpj)
+            gravaDados(linha, infocnpj)
             if a != len(lista):
                 descansa()
         else:

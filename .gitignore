@@ -8,3 +8,4 @@ test*.json
 .idea
 /cnpj
 /__pycache__
+!lista.txt
