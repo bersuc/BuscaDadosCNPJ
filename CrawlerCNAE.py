@@ -5,11 +5,6 @@ import json
 import requests
 import time
 
-"""
-Melhorando o arquivo
-criando variavel global para chamar e fechar o arquivo de texto.
-trabalhando corretamente OOP (ou tentando 😜)
-"""
 
 arq = None
 textao = None
