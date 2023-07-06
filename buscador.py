@@ -99,7 +99,6 @@ class Buscador:
 
 if __name__ == "__main__":
     buscador = Buscador()
-    inicio = time.time()
     lista = buscador.arquivos()
 
     for cnpj in lista:
@@ -109,6 +108,4 @@ if __name__ == "__main__":
         buscador.descansa()
 
     buscador.fechar()
-    fim = time.time()
-    print(fim - inicio)
     print(infoCnpj)
