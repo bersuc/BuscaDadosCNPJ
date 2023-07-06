@@ -19,13 +19,13 @@ class Buscador:
         Open lista.txt with all CNPJ's in each line. Ex: 
         27.865.757/0001-02
         27.865.757/0001-02
-        
+
         Returns:
         List
         """
         self.arq = open('lista.txt', 'r')
         lines = [line.rstrip('\n') for line in self.arq]
-        self.textao = open('dados.txt', 'w')
+        self.textao = open('dados.txt', 'w', encoding='utf-8')
         self.errosCNPJ = open('erros.txt', 'w')
         return lines
 
@@ -35,6 +35,14 @@ class Buscador:
         self.textao.close()
         self.errosCNPJ.close()
         print('Arquivos fechados com sucesso!')
+
+    def gravaErros(self, cnpj):
+        dados = {
+            "Nome": "Erro ao buscar nome",
+            "Atividade": "Erro ao buscar atividade",
+            "CNAE": "Erro ao buscar CNAE"
+        }
+        self.errosCNPJ.write('CNPJ ' + cnpj)
 
     def pegaJson(self, cnpj):
         self.contador
@@ -57,20 +65,50 @@ class Buscador:
                 print('############################################\n')
                 print('Erro ao obrter informações do cnpj')
                 print('############################################\n')
-                # gravaErros(cnpj)
+                self.gravaErros(dados)
         else:
             print('Aguardando 5 segundos. Motivo Status Code não é 200: {}'
                   .format(sc))
-            # descansa()
-            # pegaJson(cnpj)
+            self.descansa()
+        print(dados)
         return dados
+
+    def gravaDados(self, cnpj, infocnpj):
+        _nome = infocnpj['Nome']
+        _atividade = infocnpj['Atividade']
+        _cnae = infocnpj['CNAE']
+        self.textao.write(cnpj + ';' + _nome + ';' +
+                          _atividade + ';' + _cnae + '\n')
+
+    def sanitize(self, line):
+        """
+               Sanitize the cnpj
+               call the pegaJson function for each cnpj
+               close the file
+               """
+        newLine = line.replace('.', '')
+        newLine = newLine.replace('/', '')
+        newLine = newLine.replace('-', '')
+        return newLine
+
+    def descansa(self):
+        """Resting to not get blocked by API"""
+        print('Ativando Descanso de 20 segundos')
+        time.sleep(20)
 
 
 if __name__ == "__main__":
     buscador = Buscador()
     inicio = time.time()
-    var = buscador.pegaJson("27865757000102")
-    # buscador.fechar()
+    lista = buscador.arquivos()
+
+    for cnpj in lista:
+        cnpj = buscador.sanitize(cnpj)
+        infoCnpj = buscador.pegaJson(cnpj)
+        buscador.gravaDados(cnpj, infoCnpj)
+        buscador.descansa()
+
+    buscador.fechar()
     fim = time.time()
     print(fim - inicio)
-    print(var)
+    print(infoCnpj)
